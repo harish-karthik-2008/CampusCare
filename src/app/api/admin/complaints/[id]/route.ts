@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../../../../../lib/prisma";
 import { getUserFromRequest } from "../../../../../lib/auth";
+import { ResolutionAction } from "@prisma/client";
 
 export async function PATCH(
   request: NextRequest,
@@ -72,14 +73,12 @@ export async function PATCH(
       });
 
       // Add audit log
-      const actionType =
+      const actionType: ResolutionAction =
         status === "RESOLVED"
           ? "RESOLVED"
           : status === "CLOSED"
           ? "CLOSED"
-          : status === "IN_PROGRESS"
-          ? "STATUS_CHANGE"
-          : "UPDATED";
+          : "STATUS_CHANGE";
 
       const noteText =
         status === "RESOLVED"

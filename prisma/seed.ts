@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, ResolutionAction } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
@@ -350,7 +350,13 @@ async function main() {
   console.log("12 Complaints created.");
 
   // 4. Resolution Logs
-  const resolutionLogs = [
+  const resolutionLogs: Array<{
+    complaintId: string;
+    actorId: string;
+    action: ResolutionAction;
+    note: string;
+    createdAt: Date;
+  }> = [
     { complaintId: c1.id, actorId: student1.id, action: "SUBMITTED", note: "Complaint submitted by Student", createdAt: daysAgo(1, 4) },
     { complaintId: c1.id, actorId: admin.id, action: "REVIEWED", note: "Admin reviewed Wi-Fi coverage issue", createdAt: daysAgo(1, 1) },
     { complaintId: c1.id, actorId: admin.id, action: "ASSIGNED", note: "Assigned to IT Team (Lead Engineer S. Murugan)", createdAt: daysAgo(0, 5) },
