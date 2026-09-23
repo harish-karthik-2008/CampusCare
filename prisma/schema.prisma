@@ -1,13 +1,11 @@
-// Prisma schema for CampusCare
-// Smart Campus Complaint & Resolution Management System
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
@@ -15,19 +13,21 @@ model User {
   name           String
   email          String          @unique
   passwordHash   String
-  role           String          @default("STUDENT") // "STUDENT" | "ADMIN"
+  role           Role            @default(STUDENT)
   department     String?
   phone          String?
   avatar         String?
   isActive       Boolean         @default(true)
   createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-
-  complaints     Complaint[]     @relation("StudentComplaints")
+  updatedAt      DateTime        @default(now()) @updatedAt
   assignedItems  Complaint[]     @relation("AdminAssignments")
-  resolutionLogs ResolutionLog[]
-  notifications  Notification[]
+  complaints     Complaint[]     @relation("StudentComplaints")
   feedbacks      Feedback[]
+  notifications  Notification[]
+  resolutionLogs ResolutionLog[]
+
+  @@index([email])
+  @@index([role])
 }
 
 model Category {
@@ -37,69 +37,118 @@ model Category {
   icon        String?
   isActive    Boolean     @default(true)
   createdAt   DateTime    @default(now())
-
+  updatedAt   DateTime    @default(now()) @updatedAt
   complaints  Complaint[]
+
+  @@index([name])
 }
 
 model Complaint {
   id               String          @id @default(cuid())
-  complaintNumber  String          @unique // e.g. CC-1001
+  complaintNumber  String          @unique
   studentId        String
-  student          User            @relation("StudentComplaints", fields: [studentId], references: [id])
   categoryId       String
-  category         Category        @relation(fields: [categoryId], references: [id])
+  assignedAdminId  String?
   title            String
   description      String
   locationBuilding String
   locationBlock    String?
   locationRoom     String?
-  priority         String          @default("NORMAL") // "NORMAL" | "HIGH" | "CRITICAL"
-  status           String          @default("PENDING") // "PENDING" | "IN_PROGRESS" | "RESOLVED" | "CLOSED"
+  priority         Priority        @default(NORMAL)
+  status           ComplaintStatus @default(PENDING)
   attachmentUrl    String?
-  assignedTeam     String?         // "IT Team", "Maintenance Team", "Electrical Team", etc.
-  assignedAdminId  String?
-  assignedAdmin    User?           @relation("AdminAssignments", fields: [assignedAdminId], references: [id])
+  assignedTeam     String?
   resolutionNote   String?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
   resolvedAt       DateTime?
   closedAt         DateTime?
-
-  resolutionLogs   ResolutionLog[]
-  notifications    Notification[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @default(now()) @updatedAt
+  assignedAdmin    User?           @relation("AdminAssignments", fields: [assignedAdminId], references: [id])
+  category         Category        @relation(fields: [categoryId], references: [id])
+  student          User            @relation("StudentComplaints", fields: [studentId], references: [id], onDelete: Cascade)
   feedback         Feedback?
+  notifications    Notification[]
+  resolutionLogs   ResolutionLog[]
+
+  @@index([assignedAdminId])
+  @@index([categoryId])
+  @@index([complaintNumber])
+  @@index([priority])
+  @@index([status])
+  @@index([studentId])
 }
 
 model ResolutionLog {
-  id          String    @id @default(cuid())
+  id          String           @id @default(cuid())
   complaintId String
-  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
   actorId     String
-  actor       User      @relation(fields: [actorId], references: [id])
-  action      String    // "SUBMITTED" | "REVIEWED" | "ASSIGNED" | "STATUS_CHANGE" | "RESOLVED" | "CLOSED" | "REOPENED"
+  action      ResolutionAction
   note        String?
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime         @default(now())
+  actor       User             @relation(fields: [actorId], references: [id])
+  complaint   Complaint        @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+
+  @@index([actorId])
+  @@index([complaintId])
+  @@index([createdAt])
 }
 
 model Notification {
   id          String     @id @default(cuid())
   userId      String
-  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   complaintId String?
-  complaint   Complaint? @relation(fields: [complaintId], references: [id], onDelete: SetNull)
   title       String
   message     String
   isRead      Boolean    @default(false)
   createdAt   DateTime   @default(now())
+  readAt      DateTime?
+  complaint   Complaint? @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([complaintId])
+  @@index([isRead])
+  @@index([userId])
 }
 
 model Feedback {
   id          String    @id @default(cuid())
   complaintId String    @unique
-  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
   studentId   String
-  student     User      @relation(fields: [studentId], references: [id])
-  rating      Int       // 1 to 5
+  rating      Int       @db.SmallInt
   comment     String?
   createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
+  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade)
+  student     User      @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([complaintId])
+  @@index([studentId])
+}
+
+enum ComplaintStatus {
+  PENDING
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum Priority {
+  NORMAL
+  HIGH
+  CRITICAL
+}
+
+enum ResolutionAction {
+  SUBMITTED
+  REVIEWED
+  ASSIGNED
+  STATUS_CHANGE
+  RESOLVED
+  CLOSED
+  REOPENED
+}
+
+enum Role {
+  STUDENT
+  ADMIN
 }
