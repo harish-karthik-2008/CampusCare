@@ -57,9 +57,12 @@ export function Sidebar({ role, user, isOpen, onClose }: SidebarProps) {
   const navItems = role === "ADMIN" ? adminNav : studentNav;
 
   async function handleLogout() {
-    await fetch("/api/auth/logout", { method: "POST" });
-    router.push("/login");
-    router.refresh();
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // ignore
+    }
+    window.location.href = "/login";
   }
 
   async function switchDemoUser(targetRole: "STUDENT" | "ADMIN") {
@@ -70,20 +73,23 @@ export function Sidebar({ role, user, isOpen, onClose }: SidebarProps) {
         : "admin@campuscare.demo";
     const password = targetRole === "STUDENT" ? "student123" : "admin123";
 
-    const res = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (res.ok) {
-      onClose();
-      if (targetRole === "ADMIN") {
-        router.push("/admin/dashboard");
+      if (res.ok) {
+        onClose();
+        window.location.href =
+          targetRole === "ADMIN" ? "/admin/dashboard" : "/student/dashboard";
       } else {
-        router.push("/student/dashboard");
+        window.location.href = `/login?role=${targetRole.toLowerCase()}`;
       }
-      router.refresh();
+    } catch (err) {
+      console.error("Demo switch network error:", err);
+      window.location.href = `/login?role=${targetRole.toLowerCase()}`;
     }
   }
 
