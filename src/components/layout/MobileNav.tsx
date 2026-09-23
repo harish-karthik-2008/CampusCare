@@ -53,6 +53,7 @@ export function MobileNav({ role }: { role: "STUDENT" | "ADMIN" }) {
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={true}
                 className="flex flex-col items-center justify-center -mt-5"
               >
                 <div className="w-12 h-12 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-lg shadow-purple-500/40 border-2 border-white">
@@ -69,6 +70,7 @@ export function MobileNav({ role }: { role: "STUDENT" | "ADMIN" }) {
             <Link
               key={link.href}
               href={link.href}
+              prefetch={true}
               className={cn(
                 "flex flex-col items-center justify-center py-1 px-3 rounded-lg text-xs font-semibold transition-colors",
                 isActive ? "text-purple-600 font-bold" : "text-slate-500 hover:text-slate-800"

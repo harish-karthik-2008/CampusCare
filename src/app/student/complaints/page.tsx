@@ -269,80 +269,143 @@ export default function StudentComplaintsPage() {
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200">
-                <tr>
-                  <th className="py-3 px-4">Ticket</th>
-                  <th className="py-3 px-4">Issue Details</th>
-                  <th className="py-3 px-4">Category</th>
-                  <th className="py-3 px-4">Campus Location</th>
-                  <th className="py-3 px-4">Priority</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4">SLA Clock</th>
-                  <th className="py-3 px-4 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-medium">
-                {complaints.map((item) => (
-                  <tr key={item.id} className="hover:bg-purple-50/30 transition-colors group">
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span className="font-extrabold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 text-xs">
-                        {item.complaintNumber}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 max-w-xs">
-                      <Link
-                        href={`/student/complaints/${item.id}`}
-                        prefetch={true}
-                        className="font-bold text-slate-900 group-hover:text-purple-600 transition-colors truncate block"
-                      >
-                        {item.title}
-                      </Link>
-                      <p className="text-[11px] text-slate-400 mt-0.5 truncate">
-                        {item.description}
-                      </p>
-                    </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold text-[11px]">
+          <div>
+            {/* MOBILE CARDS VIEW (< sm) */}
+            <div className="sm:hidden divide-y divide-slate-100">
+              {complaints.map((item) => (
+                <div key={item.id} className="p-4 space-y-3 hover:bg-slate-50/60 transition-colors">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-extrabold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 text-xs">
+                      {item.complaintNumber}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <PriorityBadge priority={item.priority} showIcon={false} />
+                      <StatusBadge status={item.status} size="sm" />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Link
+                      href={`/student/complaints/${item.id}`}
+                      prefetch={true}
+                      className="font-bold text-sm text-slate-900 hover:text-purple-600 transition-colors block"
+                    >
+                      {item.title}
+                    </Link>
+                    <p className="text-xs text-slate-500 mt-1 line-clamp-2">
+                      {item.description}
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold text-[10px]">
                         {item.category.name}
                       </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-500 whitespace-nowrap">
-                      <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                      <span className="flex items-center gap-1 text-[11px]">
+                        <MapPin className="w-3 h-3 text-slate-400" />
                         {item.locationBuilding}
                       </span>
-                    </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <PriorityBadge priority={item.priority} showIcon={false} />
-                    </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <StatusBadge status={item.status} size="sm" />
-                    </td>
-                    <td className="py-3.5 px-4 whitespace-nowrap">
-                      <SLAIndicator
-                        createdAt={item.createdAt}
-                        priority={item.priority}
-                        status={item.status}
-                        resolvedAt={item.resolvedAt}
-                        compact
-                      />
-                    </td>
-                    <td className="py-3.5 px-4 text-right whitespace-nowrap">
-                      <Link
-                        href={`/student/complaints/${item.id}`}
-                        prefetch={true}
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all border border-purple-200/60"
-                      >
-                        <span>View</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </Link>
-                    </td>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                    <SLAIndicator
+                      createdAt={item.createdAt}
+                      priority={item.priority}
+                      status={item.status}
+                      resolvedAt={item.resolvedAt}
+                      compact
+                    />
+                    <Link
+                      href={`/student/complaints/${item.id}`}
+                      prefetch={true}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 border border-purple-200/60"
+                    >
+                      <span>View</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* DESKTOP & TABLET DATA TABLE (sm:) */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200">
+                  <tr>
+                    <th className="py-3 px-4">Ticket</th>
+                    <th className="py-3 px-4">Issue Details</th>
+                    <th className="py-3 px-4">Category</th>
+                    <th className="py-3 px-4">Campus Location</th>
+                    <th className="py-3 px-4">Priority</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4">SLA Clock</th>
+                    <th className="py-3 px-4 text-right">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium">
+                  {complaints.map((item) => (
+                    <tr key={item.id} className="hover:bg-purple-50/30 transition-colors group">
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <span className="font-extrabold text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200 text-xs">
+                          {item.complaintNumber}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 max-w-xs">
+                        <Link
+                          href={`/student/complaints/${item.id}`}
+                          prefetch={true}
+                          className="font-bold text-slate-900 group-hover:text-purple-600 transition-colors truncate block"
+                        >
+                          {item.title}
+                        </Link>
+                        <p className="text-[11px] text-slate-400 mt-0.5 truncate">
+                          {item.description}
+                        </p>
+                      </td>
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-semibold text-[11px]">
+                          {item.category.name}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-500 whitespace-nowrap">
+                        <span className="flex items-center gap-1">
+                          <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                          {item.locationBuilding}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <PriorityBadge priority={item.priority} showIcon={false} />
+                      </td>
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <StatusBadge status={item.status} size="sm" />
+                      </td>
+                      <td className="py-3.5 px-4 whitespace-nowrap">
+                        <SLAIndicator
+                          createdAt={item.createdAt}
+                          priority={item.priority}
+                          status={item.status}
+                          resolvedAt={item.resolvedAt}
+                          compact
+                        />
+                      </td>
+                      <td className="py-3.5 px-4 text-right whitespace-nowrap">
+                        <Link
+                          href={`/student/complaints/${item.id}`}
+                          prefetch={true}
+                          className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 transition-all border border-purple-200/60"
+                        >
+                          <span>View</span>
+                          <ChevronRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>

@@ -211,58 +211,89 @@ export default async function StudentDashboard() {
             </Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50/80 text-slate-500 font-bold uppercase tracking-wider text-[11px] border-b border-slate-200/60">
-                <tr>
-                  <th className="py-3.5 px-4">Ticket ID</th>
-                  <th className="py-3.5 px-4">Issue Title</th>
-                  <th className="py-3.5 px-4">Category</th>
-                  <th className="py-3.5 px-4">Location</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-4">Submitted</th>
-                  <th className="py-3.5 px-4 text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100 font-medium">
-                {recentComplaints.map((item) => (
-                  <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-3.5 px-4 font-bold text-purple-700">
+          <div>
+            {/* MOBILE RECENT COMPLAINTS CARDS (< sm) */}
+            <div className="sm:hidden divide-y divide-slate-100">
+              {recentComplaints.map((item) => (
+                <div key={item.id} className="p-4 space-y-2 hover:bg-slate-50 transition-colors">
+                  <div className="flex items-center justify-between">
+                    <span className="font-extrabold text-xs text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-200">
                       {item.complaintNumber}
-                    </td>
-                    <td className="py-3.5 px-4 font-semibold text-slate-900 max-w-xs truncate">
-                      {item.title}
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-600">
-                      <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium text-[11px]">
-                        {item.category.name}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-500">
-                      <span className="flex items-center gap-1 truncate max-w-[160px]">
-                        <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
-                        {item.locationBuilding}
-                      </span>
-                    </td>
-                    <td className="py-3.5 px-4">
-                      <StatusBadge status={item.status} size="sm" />
-                    </td>
-                    <td className="py-3.5 px-4 text-slate-400 whitespace-nowrap">
-                      {formatTimeAgo(item.createdAt)}
-                    </td>
-                    <td className="py-3.5 px-4 text-right">
-                      <Link
-                        href={`/student/complaints/${item.id}`}
-                        prefetch={true}
-                        className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-semibold text-purple-600 hover:bg-purple-50 transition-colors"
-                      >
-                        View Details
-                      </Link>
-                    </td>
+                    </span>
+                    <StatusBadge status={item.status} size="sm" />
+                  </div>
+                  <Link
+                    href={`/student/complaints/${item.id}`}
+                    prefetch={true}
+                    className="font-bold text-xs text-slate-900 hover:text-purple-600 transition-colors block"
+                  >
+                    {item.title}
+                  </Link>
+                  <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+                    <span className="flex items-center gap-1">
+                      <MapPin className="w-3 h-3 text-slate-400" />
+                      {item.locationBuilding}
+                    </span>
+                    <span>{formatTimeAgo(item.createdAt)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* DESKTOP & TABLET TABLE (sm:) */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-50/80 text-slate-500 font-bold uppercase tracking-wider text-[11px] border-b border-slate-200/60">
+                  <tr>
+                    <th className="py-3.5 px-4">Ticket ID</th>
+                    <th className="py-3.5 px-4">Issue Title</th>
+                    <th className="py-3.5 px-4">Category</th>
+                    <th className="py-3.5 px-4">Location</th>
+                    <th className="py-3.5 px-4">Status</th>
+                    <th className="py-3.5 px-4">Submitted</th>
+                    <th className="py-3.5 px-4 text-right">Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-100 font-medium">
+                  {recentComplaints.map((item) => (
+                    <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="py-3.5 px-4 font-bold text-purple-700">
+                        {item.complaintNumber}
+                      </td>
+                      <td className="py-3.5 px-4 font-semibold text-slate-900 max-w-xs truncate">
+                        {item.title}
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-600">
+                        <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-medium text-[11px]">
+                          {item.category.name}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-500">
+                        <span className="flex items-center gap-1 truncate max-w-[160px]">
+                          <MapPin className="w-3 h-3 text-slate-400 shrink-0" />
+                          {item.locationBuilding}
+                        </span>
+                      </td>
+                      <td className="py-3.5 px-4">
+                        <StatusBadge status={item.status} size="sm" />
+                      </td>
+                      <td className="py-3.5 px-4 text-slate-400 whitespace-nowrap">
+                        {formatTimeAgo(item.createdAt)}
+                      </td>
+                      <td className="py-3.5 px-4 text-right">
+                        <Link
+                          href={`/student/complaints/${item.id}`}
+                          prefetch={true}
+                          className="inline-flex items-center gap-1 px-3 py-1 rounded-lg text-xs font-semibold text-purple-600 hover:bg-purple-50 transition-colors"
+                        >
+                          View Details
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
