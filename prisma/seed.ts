@@ -389,7 +389,7 @@ async function main() {
   ];
 
   for (const log of resolutionLogs) {
-    await prisma.resolutionLog.create({ data: log });
+    await prisma.resolutionLog.create({ data: log as any });
   }
   console.log("Resolution logs created.");
 
